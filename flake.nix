@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Python development environment";
+  description = "A Nix-flake-based data-analysis environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -30,13 +30,14 @@
               export PGHOST=$PWD/postgres
               export LOG_PATH=$PWD/postgres/LOG
               export PGDATABASE=postgres
-              # export DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true
               if [ ! -d $PGHOST ]; then
                 mkdir -p $PGHOST
               fi
               if [ ! -d $PGDATA ]; then
                 echo 'Initializing postgresql database...'
-                LC_ALL=C.utf8 initdb $PGDATA --auth=trust >/dev/null
+                LC_ALL=C.utf8 initdb $PGDATA --auth=trust
+                # comment out the line above and enable execution of the line below to hide postgres startup info
+                # LC_ALL=C.utf8 initdb $PGDATA --auth=trust >/dev/null
               fi
             '';
             start_postgres = pkgs.writeShellScriptBin "start_postgres" ''
@@ -67,10 +68,8 @@
                 stop_postgres
                 postgresql
                 python311
-                virtualenv
               ] ++ (with pkgs.python311Packages; [
                 scrapy
-                pip
               ]);
               shellHook = ''
                 ${pkgs.python311}/bin/python --version
